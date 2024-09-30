@@ -1,36 +1,31 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { View, Text } from "react-native";
+import React from "react";
+import { Tabs } from "expo-router";
+import TabBar from "../components/TabBar";
+import { UserProvider, useUserContext } from "@/context/UserContext";
+import { User } from "@/typings/User";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+const _layout = () => {
+  return (
+    <UserProvider>
+      <MainTabs />
+    </UserProvider>
+  );
+};
 
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
+const MainTabs = () => {
+  const { user } = useUserContext();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
+    <Tabs tabBar={(props) => <TabBar {...props} user={user as unknown as User} />}>
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Inicio",
+        }}
+      />
+    </Tabs>
   );
-}
+};
+
+export default _layout;

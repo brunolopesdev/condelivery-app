@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import { Rating } from "@/typings/Ratings";
 
 export default function Home() {
   const navigation = useNavigation();
@@ -36,15 +38,23 @@ export default function Home() {
     },
   ];
 
-  const [ratings, setRatings] = useState([
-    { id: 1, nota: 5, comentarios: "Excelente serviço! Muito rápido." },
-    { id: 2, nota: 4, comentarios: "Bom, mas poderia melhorar." },
-    {
-      id: 3,
-      nota: 3,
-      comentarios: "Serviço razoável, algumas falhas na entrega.",
-    },
-  ]);
+  const [ratings, setRatings] = useState<Rating[]>([]);
+
+  const fetchRatings = async () => {
+    try {
+      const { data } = await axios.get(
+        `https://condelivery-backend.vercel.app/avaliacoes`
+      );
+
+      setRatings(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRatings();
+  }, []);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -56,7 +66,7 @@ export default function Home() {
         </Text>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => console.log("Iniciar")}
+          onPress={() => navigation.navigate("login" as never)}
         >
           <Text style={styles.buttonText}>Começar</Text>
         </TouchableOpacity>
@@ -96,7 +106,7 @@ export default function Home() {
         <TextInput style={styles.input} placeholder="Email" />
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("Login" as never)}
+          onPress={() => navigation.navigate("login" as never)}
         >
           <Text style={styles.buttonText}>Enviar</Text>
         </TouchableOpacity>
@@ -108,10 +118,11 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#fff",
+    paddingBottom: 100,
   },
   header: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#EDF2F7",
     padding: 20,
     alignItems: "center",
     borderRadius: 8,
@@ -158,6 +169,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#f0f0f0",
   },
   image: {
     width: "100%",
@@ -180,6 +193,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#f0f0f0",
   },
   ratingTitle: {
     fontWeight: "bold",
